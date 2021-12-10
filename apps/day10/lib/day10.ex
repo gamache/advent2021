@@ -16,15 +16,14 @@ defmodule Day10 do
     |> Enum.map(&String.codepoints/1)
   end
 
-  @spec validate(line, stack) :: :valid | {:incomplete, stack} | {:corrupted, String.t()}
+  @spec validate(line, stack) :: :ok | {:incomplete, stack} | {:corrupted, String.t()}
   defp validate(line, stack \\ [])
 
-  defp validate([], []), do: :valid
+  defp validate([], []), do: :ok
 
   defp validate([], stack), do: {:incomplete, stack}
 
   defp validate([c | rest], stack) when c in @openers do
-    ## Always legal to open a collection
     validate(rest, [c | stack])
   end
 
