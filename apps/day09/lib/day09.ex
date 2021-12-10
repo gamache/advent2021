@@ -76,12 +76,13 @@ defmodule Day09 do
       new_coords
       |> Enum.flat_map(&adjacent_coords/1)
       |> Enum.filter(fn coord -> !(coord in basin) end)
-      #  |> Enum.filter(fn coord -> !(coord in new_coords) end)
+      |> Enum.filter(fn coord -> !(coord in new_coords) end)
 
     basin = Enum.uniq(basin ++ new_coords)
 
     find_basin(heightmap, next_coords, basin)
   end
+
 
   def part2(filename \\ "input.txt") do
     heightmap = heightmap(filename)
