@@ -29,7 +29,7 @@ defmodule Day09 do
       {row - 1, col},
       {row + 1, col},
       {row, col - 1},
-      {row, col + 1},
+      {row, col + 1}
     ]
   end
 
@@ -62,15 +62,11 @@ defmodule Day09 do
   defp find_basin(_heightmap, [], basin), do: basin
 
   defp find_basin(heightmap, coords_to_check, basin) do
-    #IO.inspect(coords_to_check, label: :to_check)
-    #IO.inspect(basin, label: :basin)
-
     new_coords =
       coords_to_check
       |> Enum.filter(fn coord -> heightmap[coord] end)
       |> Enum.filter(fn coord -> heightmap[coord] < 9 end)
       |> Enum.filter(fn coord -> !(coord in basin) end)
-      |> Enum.filter(fn coord -> local_minimum?(heightmap, coord, basin) end)
 
     next_coords =
       new_coords
@@ -82,7 +78,6 @@ defmodule Day09 do
 
     find_basin(heightmap, next_coords, basin)
   end
-
 
   def part2(filename \\ "input.txt") do
     heightmap = heightmap(filename)
