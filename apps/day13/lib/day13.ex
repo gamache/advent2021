@@ -74,14 +74,14 @@ defmodule Day13 do
   defp grid_to_string(grid) do
     keys = Map.keys(grid)
     [{xmin, _} | _] = Enum.sort_by(keys, fn {x, _} -> x end)
-    [{ymin, _} | _] = Enum.sort_by(keys, fn {y, _} -> y end)
+    [{_, ymin} | _] = Enum.sort_by(keys, fn {_, y} -> y end)
     [{xmax, _} | _] = Enum.sort_by(keys, fn {x, _} -> 0 - x end)
-    [{ymax, _} | _] = Enum.sort_by(keys, fn {y, _} -> 0 - y end)
+    [{_, ymax} | _] = Enum.sort_by(keys, fn {_, y} -> 0 - y end)
 
-    Enum.map(ymin..ymax, fn y ->
-      Enum.map(xmin..xmax, fn x ->
-        if grid[{x, y}], do: "#", else: " "
-      end)
+    ymin..ymax
+    |> Enum.map(fn y ->
+      xmin..xmax
+      |> Enum.map(fn x -> if grid[{x, y}], do: "#", else: " " end)
       |> Enum.join("")
     end)
     |> Enum.join("\n")
