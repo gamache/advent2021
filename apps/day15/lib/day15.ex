@@ -23,8 +23,8 @@ defmodule Day15 do
     [{x - 1, y}, {x + 1, y}, {x, y - 1}, {x, y + 1}]
   end
 
-  defp dfs(cavern, end_coord, paths, coord_costs) do
-    :erlang.system_time(:second) |> IO.inspect(label: :entered_dfs_at)
+  defp bfs(cavern, end_coord, paths, coord_costs) do
+    :erlang.system_time(:second) |> IO.inspect(label: :entered_bfs_at)
     coord_costs |> map_size() |> IO.inspect(label: :costs_count)
     paths |> Enum.count() |> IO.inspect(label: :paths_count)
 
@@ -88,13 +88,13 @@ defmodule Day15 do
         complete_paths |> Enum.sort_by(fn p -> p.cost end) |> List.first()
 
       complete_paths == [] ->
-        dfs(cavern, end_coord, new_paths, coord_costs)
+        bfs(cavern, end_coord, new_paths, coord_costs)
 
       :else ->
         ## Remove any paths of higher cost than the cheapest complete path
         [%{cost: cost} | _] = complete_paths
         new_paths = Enum.filter(new_paths, fn p -> p.cost <= cost end)
-        dfs(cavern, end_coord, new_paths, coord_costs)
+        bfs(cavern, end_coord, new_paths, coord_costs)
     end
   end
 
@@ -104,7 +104,7 @@ defmodule Day15 do
     [{xmax, _} | _] = cavern |> Map.keys() |> Enum.sort_by(fn {x, _} -> 0 - x end)
     [{_, ymax} | _] = cavern |> Map.keys() |> Enum.sort_by(fn {_, y} -> 0 - y end)
 
-    dfs(cavern, {xmax, ymax}, [%{coords: [{0, 0}], cost: 0, complete: false}], %{})
+    bfs(cavern, {xmax, ymax}, [%{coords: [{0, 0}], cost: 0, complete: false}], %{})
     |> Map.get(:cost)
   end
 
@@ -147,7 +147,7 @@ defmodule Day15 do
     [{xmax, _} | _] = cavern |> Map.keys() |> Enum.sort_by(fn {x, _} -> 0 - x end)
     [{_, ymax} | _] = cavern |> Map.keys() |> Enum.sort_by(fn {_, y} -> 0 - y end)
 
-    dfs(cavern, {xmax, ymax}, [%{coords: [{0, 0}], cost: 0, complete: false}], %{})
+    bfs(cavern, {xmax, ymax}, [%{coords: [{0, 0}], cost: 0, complete: false}], %{})
     |> Map.get(:cost)
   end
 
