@@ -1,7 +1,6 @@
 defmodule Day17 do
   @type target :: %{xmin: integer, xmax: integer, ymin: integer, ymax: integer}
   @type state :: %{x: integer, y: integer, vx: integer, vy: integer}
-  @type coord :: {integer, integer}
 
   defp target(filename) do
     "target area: " <> targets = filename |> File.read!() |> String.trim()
@@ -58,6 +57,7 @@ defmodule Day17 do
   end
 
   ## Returns all starting states that *might* hit the target.
+  @spec starting_states(target) :: [state]
   defp starting_states(target) do
     for vx <- 0..target.xmax,
         vy <- target.ymin..abs(target.ymin) do
@@ -66,7 +66,7 @@ defmodule Day17 do
   end
 
   ## Returns the highest Y achievable while hitting the target.
-  # @spec find_best_y(target, non_neg_integer, non_neg_integer, non_neg_integer) :: non_neg_integer
+  @spec find_best_y(target) :: integer
   defp find_best_y(target) do
     target
     |> starting_states()
