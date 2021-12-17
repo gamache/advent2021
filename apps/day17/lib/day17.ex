@@ -43,7 +43,9 @@ defmodule Day17 do
 
   @spec past_target?(state, target) :: boolean
   defp past_target?(state, target) do
-    state.y < target.ymin && state.vy < 0
+    (state.y < target.ymin && state.vy < 0) ||
+      state.x > target.xmax ||
+      (state.x < target.xmin && state.vx == 0)
   end
 
   @spec hits_target?(state, target) :: boolean
@@ -55,50 +57,23 @@ defmodule Day17 do
     end
   end
 
-  ## Returns lists of coords exactly `d` moves from 0,0.
-  @spec first_quadrant_coords(non_neg_integer) :: [coord]
-  defp first_quadrant_coords(d) do
-    (Enum.map(0..d, fn x -> {x, d} end) ++ Enum.map(0..d, fn y -> {d, y} end))
-    |> Enum.uniq()
-  end
-
-  @spec fourth_quadrant_coords(non_neg_integer) :: [coord]
-  defp fourth_quadrant_coords(d) do
-    (Enum.map(0..d, fn x -> {x, 0 - d} end) ++ Enum.map(0..d, fn y -> {d, 0 - y} end))
-    |> Enum.uniq()
-  end
-
-  ## Returns maximum extent of X,Y velocities to check.
-  defp dmax(target) do
-    max(abs(target.ymin), target.xmax)
+  ## Returns all starting states that *might* hit the target.
+  defp starting_states(target) do
+    for vx <- 0..target.xmax,
+        vy <- target.ymin..abs(target.ymin) do
+      %{x: 0, y: 0, vx: vx, vy: vy}
+    end
   end
 
   ## Returns the highest Y achievable while hitting the target.
-  @spec find_best_y(target, non_neg_integer, non_neg_integer, non_neg_integer) :: non_neg_integer
-  defp find_best_y(target, dmax \\ nil, d \\ 1, best_y \\ 0) do
-    dmax = if dmax, do: dmax, else: dmax(target)
-
-    states =
-      d
-      |> first_quadrant_coords()
-      |> Enum.map(fn {vx, vy} -> %{x: 0, y: 0, vx: vx, vy: vy} end)
-
-    hits = Enum.filter(states, fn state -> hits_target?(state, target) end)
-
-    cond do
-      d > dmax ->
-        best_y
-
-      Enum.count(hits) > 0 ->
-        ## maybe hit a new best
-        y = hits |> Enum.map(&find_max_y/1) |> Enum.max()
-        best_y = if y > best_y, do: y, else: best_y
-        find_best_y(target, dmax, d + 1, best_y)
-
-      :else ->
-        ## we haven't hit anything yet, keep going
-        find_best_y(target, dmax, d + 1, best_y)
-    end
+  # @spec find_best_y(target, non_neg_integer, non_neg_integer, non_neg_integer) :: non_neg_integer
+  defp find_best_y(target) do
+    target
+    |> starting_states()
+    |> Enum.filter(fn state -> hits_target?(state, target) end)
+    |> Enum.map(&find_max_y/1)
+    |> Enum.sort()
+    |> List.last()
   end
 
   ## Returns the highest Y achieved by this state.
@@ -118,24 +93,17 @@ defmodule Day17 do
   end
 
   ## Returns all starting states that hit the target.
-  @spec find_all_velocities(target, non_neg_integer) :: [state]
-  defp find_all_velocities(target, dmax \\ nil) do
-    dmax = if dmax, do: dmax, else: dmax(target)
-
-    coords =
-      Enum.flat_map(1..dmax, &first_quadrant_coords/1) ++
-        Enum.flat_map(1..dmax, &fourth_quadrant_coords/1)
-
-    coords
-    |> Enum.uniq()
-    |> Enum.map(fn {vx, vy} -> %{x: 0, y: 0, vx: vx, vy: vy} end)
+  @spec find_hits(target) :: [state]
+  defp find_hits(target) do
+    target
+    |> starting_states()
     |> Enum.filter(fn state -> hits_target?(state, target) end)
   end
 
   def part2(filename \\ "input.txt") do
     filename
     |> target
-    |> find_all_velocities()
+    |> find_hits()
     |> Enum.count()
   end
 end
