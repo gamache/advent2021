@@ -14,46 +14,52 @@ defmodule Day25 do
   end
 
   def move_down(input) do
-    xmax = input |> Enum.map(fn {{x, _}, _} -> x end) |> Enum.max
-    ymax = input |> Enum.map(fn {{_, y}, _} -> y end) |> Enum.max
+    xmax = input |> Enum.map(fn {{x, _}, _} -> x end) |> Enum.max()
+    ymax = input |> Enum.map(fn {{_, y}, _} -> y end) |> Enum.max()
 
     Enum.reduce(0..xmax, input, fn x, acc ->
       Enum.reduce(0..ymax, acc, fn y, acc2 ->
-        case input[{x,y}] do
+        case input[{x, y}] do
           "v" ->
-            case input[{x,rem(y+1, ymax+1)}] do
+            case input[{x, rem(y + 1, ymax + 1)}] do
               "." ->
                 Map.merge(acc2, %{
-                  {x,y} => ".",
-                  {x,rem(y+1, ymax+1)} => "v"
+                  {x, y} => ".",
+                  {x, rem(y + 1, ymax + 1)} => "v"
                 })
 
-              _ -> acc2
+              _ ->
+                acc2
             end
-          _ -> acc2
+
+          _ ->
+            acc2
         end
       end)
     end)
   end
 
   def move_right(input) do
-    xmax = input |> Enum.map(fn {{x, _}, _} -> x end) |> Enum.max
-    ymax = input |> Enum.map(fn {{_, y}, _} -> y end) |> Enum.max
+    xmax = input |> Enum.map(fn {{x, _}, _} -> x end) |> Enum.max()
+    ymax = input |> Enum.map(fn {{_, y}, _} -> y end) |> Enum.max()
 
     Enum.reduce(0..xmax, input, fn x, acc ->
       Enum.reduce(0..ymax, acc, fn y, acc2 ->
-        case input[{x,y}] do
+        case input[{x, y}] do
           ">" ->
-            case input[{rem(x+1,xmax+1),y}] do
+            case input[{rem(x + 1, xmax + 1), y}] do
               "." ->
                 Map.merge(acc2, %{
-                  {x,y} => ".",
-                  {rem(x+1, xmax+1),y} => ">"
+                  {x, y} => ".",
+                  {rem(x + 1, xmax + 1), y} => ">"
                 })
 
-              _ -> acc2
+              _ ->
+                acc2
             end
-          _ -> acc2
+
+          _ ->
+            acc2
         end
       end)
     end)
@@ -61,8 +67,8 @@ defmodule Day25 do
 
   def step(input) do
     input
-  |> move_right
-  |> move_down
+    |> move_right
+    |> move_down
   end
 
   def move_until_stop(input, turns \\ 1) do
